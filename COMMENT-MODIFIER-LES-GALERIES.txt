@@ -1,0 +1,18 @@
+COMMENT MODIFIER LE SITE — GALERIES + OFFRES
+
+Tout se gère maintenant dans : galeries.js
+
+1) GALERIES (Pièces montées, Gâteaux, Pâtisseries, Traiteur)
+- Mets la photo dans le bon dossier assets.
+- Ajoute/supprime/déplace une ligne dans galerieItems.
+- L’ordre des lignes = l’ordre sur le site.
+- Pour plusieurs angles, utilise angles: ["photo-angle-1.jpg"].
+
+2) OFFRES & ACTUALITÉS (page d’accueil)
+- Mets l’affiche dans assets/flyers/.
+- Ajoute/supprime/déplace une ligne dans flyerItems.
+- L’ordre des lignes = l’ordre des cartes sur le site.
+- type: "pizza" garde le bouton Réservez + téléphone + samedi soir.
+- type: "normal" affiche le texte classique.
+
+Tu n’as plus besoin de modifier index.html pour ajouter/supprimer une offre.

@@ -1,0 +1,10 @@
+AJOUTER / REMPLACER LES FLYERS
+
+Déposez simplement vos images dans ce dossier avec ces noms :
+- flyer-pizza.jpg
+- formule-sandwich-1.jpg
+- formule-sandwich-2.jpg
+- flyer-noel.jpg
+
+Le site les affichera automatiquement à la place des visuels temporaires.
+Formats conseillés : JPG ou WebP, portrait, idéalement environ 1080 x 1350 px.
