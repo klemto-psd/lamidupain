@@ -66,6 +66,7 @@ const galerieItems = [
   // ========================================================
   { image: "piece-01.jpg", category: "piece-montee", angles: ["piece-01-angle-1.jpg"] },
   { image: "piece-34.jpeg", category: "piece-montee", angles: ["piece-34-angle-1.jpeg","piece-34-angle-2.jpeg"]},
+  { image: "piece-35.jpg", category: "piece-montee", angles: ["piece-35-angle-1.jpg"] },  
   { image: "piece-02.jpg", category: "piece-montee" },
   { image: "piece-03.jpg", category: "piece-montee" },
   { image: "piece-04.jpg", category: "piece-montee" },
