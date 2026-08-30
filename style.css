@@ -359,3 +359,15 @@ body.flyer-lightbox-lock{overflow:hidden}
 /* SEO: H1 accessible sans modifier le design */
 .seo-h1{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 .pieces-gallery h1{font:400 clamp(42px,5vw,72px)/1.05 "Playfair Display",serif;text-align:center;margin:12px 0 20px}
+
+/* V3.10 — mobile uniquement : afficher la photo Pièce montée en entier */
+@media(max-width:850px){
+  .feature-photo.piece-montee-photo{
+    min-height:0 !important;
+    height:auto !important;
+    aspect-ratio:2048 / 1153;
+    background-size:contain !important;
+    background-position:center center !important;
+    background-repeat:no-repeat !important;
+  }
+}
