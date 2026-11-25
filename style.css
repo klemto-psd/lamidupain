@@ -371,36 +371,3 @@ body.flyer-lightbox-lock{overflow:hidden}
     background-repeat:no-repeat !important;
   }
 }
-
-/* ============================================================
-   V3.11 — LIGHTBOX FLYER RECTO / VERSO + DÉPLIANT 2 VOLETS
-   ============================================================ */
-.flyer-lightbox{position:fixed;inset:0;z-index:9999;background:rgba(16,12,9,.94);display:none;align-items:center;justify-content:center;padding:35px}
-.flyer-lightbox.open{display:flex}
-body.flyer-lightbox-lock{overflow:hidden}
-.flyer-viewer{width:min(1200px,92vw);height:min(820px,88vh);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;perspective:1800px}
-.flyer-book{position:relative;width:min(900px,82vw);max-height:72vh;aspect-ratio:2/1;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.22,.61,.36,1);filter:drop-shadow(0 24px 35px rgba(0,0,0,.35))}
-.flyer-face{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform-style:preserve-3d}
-.flyer-front{transform:rotateY(0deg)}
-.flyer-back{transform:rotateY(180deg)}
-.flyer-face img{width:100%;height:100%;object-fit:contain;display:block}
-.flyer-book.show-back{transform:rotateY(180deg)}
-.flyer-face::after{content:"";position:absolute;top:0;bottom:0;left:50%;width:2px;transform:translateX(-50%);background:linear-gradient(to right,rgba(0,0,0,.18),rgba(255,255,255,.22),rgba(0,0,0,.08));pointer-events:none}
-.flyer-face::before{content:"";position:absolute;top:0;bottom:0;left:calc(50% - 18px);width:36px;background:linear-gradient(90deg,transparent,rgba(0,0,0,.08),transparent);pointer-events:none}
-.flyer-book.flyer-opening{animation:flyerOpen .8s cubic-bezier(.22,.61,.36,1)}
-@keyframes flyerOpen{0%{opacity:0;transform:rotateX(7deg) rotateY(-18deg) scale(.82)}55%{opacity:1;transform:rotateX(2deg) rotateY(4deg) scale(1.025)}100%{opacity:1;transform:rotateX(0) rotateY(0) scale(1)}}
-.flyer-lightbox-image,.flyer-verso{transition:opacity .15s ease,transform .25s ease}
-.flyer-lightbox-image.changing{opacity:.2;transform:scale(.98)}
-.flyer-controls{margin-top:24px;display:flex;align-items:center;justify-content:center;gap:10px;z-index:10}
-.flyer-open-btn,.flyer-side-btn,.flyer-side-controls .flyer-side-btn{border:1px solid rgba(255,255,255,.32);background:rgba(255,255,255,.1);color:#fff;padding:11px 20px;font-family:"DM Sans",sans-serif;font-size:12px;font-weight:600;letter-spacing:.7px;cursor:pointer;transition:background .2s ease,color .2s ease,transform .2s ease}
-.flyer-open-btn:hover,.flyer-side-btn:hover,.flyer-side-controls .flyer-side-btn:hover{background:#fff;color:#222;transform:translateY(-2px)}
-.flyer-side-btn.active,.flyer-side-controls .flyer-side-btn.active{background:#fff;color:#222;border-color:#fff}
-.flyer-side-controls{margin-top:18px;display:flex;align-items:center;justify-content:center;gap:10px}
-.flyer-hint{color:rgba(255,255,255,.65);font-size:11px;margin-top:13px;letter-spacing:.5px;text-align:center}
-.flyer-lightbox-close{position:fixed;right:24px;top:20px;width:48px;height:48px;border:0;background:#fff;color:#222;font-size:32px;line-height:1;cursor:pointer;z-index:10000;transition:background .2s ease,color .2s ease,transform .2s ease}
-.flyer-lightbox-close:hover{background:#C49267;color:#fff;transform:rotate(90deg)}
-.flyer-visual{cursor:zoom-in;border:0;padding:0;width:100%;display:block}
-.flyer-visual img{cursor:zoom-in}
-.flyer-lightbox-image{max-width:min(94vw,1050px);max-height:72vh;width:100%;height:100%;object-fit:contain}
-@media(max-width:700px){.flyer-lightbox{padding:60px 10px 25px}.flyer-viewer{width:96vw;height:86vh}.flyer-book{width:94vw;max-height:62vh}.flyer-controls,.flyer-side-controls{margin-top:18px;gap:7px;flex-wrap:wrap}.flyer-open-btn,.flyer-side-btn,.flyer-side-controls .flyer-side-btn{padding:10px 14px;font-size:11px}.flyer-lightbox-close{right:12px;top:12px;width:44px;height:44px}.flyer-hint{font-size:10px}}
-
