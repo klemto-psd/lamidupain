@@ -74,31 +74,82 @@ initGalerie({category:'traiteur',dossier:'assets/traiteur',gridSelector:'#galeri
 
 
 // ============================================================
-// OFFRES & ACTUALITÉS — génération automatique depuis galeries.js
-// Modifie uniquement "flyerItems" dans galeries.js.
+// OFFRES & ACTUALITÉS — SANITY + secours local
+// La section reste visible même si Sanity est indisponible.
 // ============================================================
-(()=>{
+(async()=>{
  const grid=document.querySelector('#flyers-grid');
- if(!grid || typeof flyerItems==='undefined') return;
+ if(!grid)return;
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
- grid.innerHTML=flyerItems.map((item,i)=>{
+ const projectId='6c347qaw', dataset='production';
+ const today=new Date().toISOString().slice(0,10);
+ const query=`*[_type == "enCeMoment" && afficher == true && (!defined(dateDebut) || dateDebut <= $today) && (!defined(dateFin) || dateFin >= $today)] | order(ordre asc){_id,titre,categorie,description,"imageUrl":image.asset->url,"imageVersoUrl":imageVerso.asset->url}`;
+ const url=`https://${projectId}.api.sanity.io/v2026-11-25/data/query/${dataset}?query=${encodeURIComponent(query)}&$today=${encodeURIComponent(JSON.stringify(today))}`;
+
+ const localItems=()=>typeof flyerItems!=='undefined'?flyerItems.map(item=>({
+   titre:item.titre,categorie:item.categorie,description:item.texte||'',telephone:item.telephone||'',
+   imageUrl:item.image?`assets/flyers/${item.image}`:'',imageVersoUrl:item.imageVerso?`assets/flyers/${item.imageVerso}`:''
+ })):[];
+
+ let items=[];
+ try{
+   const response=await fetch(url);
+   if(!response.ok)throw new Error(`Sanity ${response.status}`);
+   const data=await response.json();
+   items=(data.result||[]).filter(item=>item.imageUrl);
+ }catch(error){
+   console.warn('Sanity indisponible, affichage des offres locales.',error);
+ }
+ if(!items.length)items=localItems();
+
+ grid.innerHTML=items.map((item,i)=>{
    const tel=String(item.telephone||'').replace(/\s/g,'');
-   const info=`<span class="flyer-tag">${esc(item.categorie)}</span><h3>${esc(item.titre)}</h3>${item.texte?`<p>${esc(item.texte)}</p>`:''}${item.texte2?`<p class="pizza-reserve">${esc(item.texte2)}</p>`:''}${tel?`<a class="flyer-call-btn" href="tel:${esc(tel)}" aria-label="Appeler pour réserver">☎ ${esc(item.telephone)}</a>`:''}`;
-   const noel=String(item.image||'').toLowerCase().includes('noel');
-   const placeholder=noel?'Collection de Noël':item.titre;
-   return `<article class="flyer-card${tel?' flyer-card-featured':''}${noel?' flyer-seasonal':''}"><div class="flyer-visual" data-flyer="${i}"><img src="assets/flyers/${esc(item.image)}" alt="${esc(item.titre)} — L’Ami du Pain" onerror="this.style.display='none'"><div class="flyer-placeholder"><span>✦</span><strong>${esc(placeholder)}</strong><small>Ajoutez ${esc(item.image)} dans assets/flyers</small></div></div><div class="flyer-info">${info}</div></article>`;
+   return `<article class="flyer-card"><button class="flyer-visual" data-flyer="${i}" type="button" aria-label="Voir ${esc(item.titre)} en grand">${item.imageUrl?`<img src="${esc(item.imageUrl)}" alt="${esc(item.titre)} — L’Ami du Pain" loading="lazy">`:''}</button><div class="flyer-info">${item.categorie?`<span class="flyer-tag">${esc(item.categorie)}</span>`:''}<h3>${esc(item.titre)}</h3>${item.description?`<p>${esc(item.description)}</p>`:''}${tel?`<a class="flyer-call-btn" href="tel:${esc(tel)}">☎ ${esc(item.telephone)}</a>`:''}</div></article>`;
  }).join('');
 
  const box=document.querySelector('#flyer-lightbox');
  if(!box)return;
- const big=box.querySelector('.flyer-lightbox-image');
+ const book=box.querySelector('#flyer-book');
+ const recto=box.querySelector('.flyer-recto');
+ const verso=box.querySelector('.flyer-verso');
  const closeBtn=box.querySelector('.flyer-lightbox-close');
- const open=(img)=>{if(!img || getComputedStyle(img).display==='none')return;big.src=img.src;big.alt=img.alt;box.classList.add('open');box.setAttribute('aria-hidden','false');document.body.classList.add('flyer-lightbox-lock')};
- const close=()=>{box.classList.remove('open');box.setAttribute('aria-hidden','true');document.body.classList.remove('flyer-lightbox-lock');big.src=''};
- document.querySelectorAll('.flyer-visual img').forEach(img=>img.addEventListener('click',()=>open(img)));
- closeBtn.addEventListener('click',close);
+ const sideBtn=box.querySelector('.flyer-side-btn');
+ const controls=box.querySelector('.flyer-controls');
+ const hint=box.querySelector('.flyer-hint');
+ if(!book||!recto||!verso)return;
+ let current=null, back=false;
+
+ const update=()=>{
+   const hasVerso=!!current?.imageVersoUrl;
+   book.classList.toggle('show-back',back&&hasVerso);
+   book.classList.toggle('single-flyer',!hasVerso);
+   if(controls)controls.hidden=!hasVerso;
+   if(hint)hint.hidden=!hasVerso;
+   if(sideBtn)sideBtn.textContent=back?'Revenir au recto':'Ouvrir le flyer';
+ };
+ const setSide=value=>{if(!current?.imageVersoUrl)return;back=value;update()};
+ const toggle=()=>setSide(!back);
+ const open=item=>{
+   if(!item?.imageUrl)return;
+   current=item;back=false;
+   recto.src=item.imageUrl;recto.alt=`${item.titre} — Recto`;
+   if(item.imageVersoUrl){verso.src=item.imageVersoUrl;verso.alt=`${item.titre} — Verso`}
+   else{verso.removeAttribute('src');verso.alt=''}
+   update();
+   book.classList.remove('flyer-opening');void book.offsetWidth;book.classList.add('flyer-opening');
+   box.classList.add('open');box.setAttribute('aria-hidden','false');document.body.classList.add('flyer-lightbox-lock');
+ };
+ const close=()=>{
+   box.classList.remove('open');box.setAttribute('aria-hidden','true');document.body.classList.remove('flyer-lightbox-lock');
+   book.classList.remove('show-back','flyer-opening');recto.removeAttribute('src');verso.removeAttribute('src');current=null;back=false;
+ };
+ grid.querySelectorAll('.flyer-visual').forEach(btn=>btn.addEventListener('click',()=>open(items[Number(btn.dataset.flyer)])));
+ book.addEventListener('click',toggle);
+ book.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&current?.imageVersoUrl){e.preventDefault();toggle()}});
+ sideBtn?.addEventListener('click',toggle);
+ closeBtn?.addEventListener('click',close);
  box.addEventListener('click',e=>{if(e.target===box)close()});
- addEventListener('keydown',e=>{if(e.key==='Escape'&&box.classList.contains('open'))close()});
+ addEventListener('keydown',e=>{if(!box.classList.contains('open'))return;if(e.key==='Escape')close();if(e.key==='ArrowRight')setSide(true);if(e.key==='ArrowLeft')setSide(false)});
 })();
 
 // Photo de la section "Une boulangerie familiale" gérée depuis galeries.js
