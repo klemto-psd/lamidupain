@@ -394,3 +394,61 @@ body.flyer-lightbox-lock{overflow:hidden}
 .brochure:not(.simple-flyer)[data-state="closed"]{width:min(450px,42vw);aspect-ratio:1/1}
 .brochure:not(.simple-flyer)[data-state="closed"] .brochure-cover-page{left:0;right:0}
 @media(max-width:700px){.brochure:not(.simple-flyer)[data-state="closed"]{width:min(82vw,450px)}.brochure{width:94vw}}
+\n\n/* V4.2 — cartes offres + alerte fermeture renforcée */
+.flyer-visual{
+  display:block!important;
+  width:100%!important;
+  border:0!important;
+  padding:0!important;
+  margin:0!important;
+  appearance:none;
+  -webkit-appearance:none;
+  cursor:pointer;
+}
+.flyer-visual img{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+}
+.vacation-banner{
+  position:relative!important;
+  z-index:1100!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+  min-height:96px!important;
+  padding:22px 6vw!important;
+  background:#e2b509!important;
+  color:#172f36!important;
+  border:0!important;
+  border-bottom:1px solid rgba(0,0,0,.12)!important;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:8px 16px;
+  text-align:center!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.08);
+}
+.vacation-banner[hidden]{display:none!important}
+.vacation-banner strong{
+  display:block!important;
+  width:100%;
+  margin:0!important;
+  font-size:18px!important;
+  line-height:1.1!important;
+  letter-spacing:1.4px!important;
+  font-weight:800!important;
+}
+.vacation-banner span{
+  display:block;
+  width:100%;
+  font-size:15px!important;
+  line-height:1.45!important;
+  font-weight:600!important;
+}
+@media(max-width:700px){
+  .vacation-banner{min-height:82px!important;padding:17px 18px!important}
+  .vacation-banner strong{font-size:15px!important}
+  .vacation-banner span{font-size:13px!important}
+}
