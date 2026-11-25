@@ -176,18 +176,25 @@
 <div class="flyer-lightbox" id="flyer-lightbox" aria-hidden="true">
   <button class="flyer-lightbox-close" type="button" aria-label="Fermer">×</button>
   <div class="flyer-viewer">
-    <div class="flyer-book" id="flyer-book" role="button" tabindex="0" aria-label="Retourner le flyer">
-      <div class="flyer-face flyer-front">
-        <img class="flyer-lightbox-image flyer-recto" src="" alt="Recto du flyer">
-      </div>
-      <div class="flyer-face flyer-back">
-        <img class="flyer-verso" src="" alt="Verso du flyer">
+    <div class="brochure-stage" id="brochure-stage">
+      <div class="brochure" id="flyer-book" tabindex="0" aria-label="Dépliant interactif">
+        <div class="brochure-inside">
+          <img class="flyer-verso" src="" alt="Pages intérieures 2 et 3 du flyer">
+        </div>
+        <div class="brochure-outside">
+          <img class="flyer-recto" src="" alt="Pages extérieures 4 et 1 du flyer">
+        </div>
+        <div class="brochure-cover" aria-hidden="true">
+          <div class="brochure-cover-face brochure-cover-front"></div>
+          <div class="brochure-cover-face brochure-cover-back"></div>
+        </div>
       </div>
     </div>
     <div class="flyer-controls">
-      <button class="flyer-side-btn" type="button">Ouvrir le flyer</button>
+      <button class="flyer-open-btn" type="button">Ouvrir le flyer</button>
+      <button class="flyer-flip-btn" type="button" hidden>Voir l’extérieur (pages 4–1)</button>
     </div>
-    <p class="flyer-hint">Cliquez sur le flyer pour voir l’intérieur</p>
+    <p class="flyer-hint">Cliquez sur « Ouvrir le flyer » pour déplier la couverture</p>
   </div>
 </div>
 

@@ -74,8 +74,7 @@ initGalerie({category:'traiteur',dossier:'assets/traiteur',gridSelector:'#galeri
 
 
 // ============================================================
-// OFFRES & ACTUALITÉS — SANITY + secours local
-// La section reste visible même si Sanity est indisponible.
+// OFFRES & ACTUALITÉS — SANITY + vrai dépliant 2 volets
 // ============================================================
 (async()=>{
  const grid=document.querySelector('#flyers-grid');
@@ -85,71 +84,55 @@ initGalerie({category:'traiteur',dossier:'assets/traiteur',gridSelector:'#galeri
  const today=new Date().toISOString().slice(0,10);
  const query=`*[_type == "enCeMoment" && afficher == true && (!defined(dateDebut) || dateDebut <= $today) && (!defined(dateFin) || dateFin >= $today)] | order(ordre asc){_id,titre,categorie,description,"imageUrl":image.asset->url,"imageVersoUrl":imageVerso.asset->url}`;
  const url=`https://${projectId}.api.sanity.io/v2026-11-25/data/query/${dataset}?query=${encodeURIComponent(query)}&$today=${encodeURIComponent(JSON.stringify(today))}`;
-
- const localItems=()=>typeof flyerItems!=='undefined'?flyerItems.map(item=>({
-   titre:item.titre,categorie:item.categorie,description:item.texte||'',telephone:item.telephone||'',
-   imageUrl:item.image?`assets/flyers/${item.image}`:'',imageVersoUrl:item.imageVerso?`assets/flyers/${item.imageVerso}`:''
- })):[];
-
+ const localItems=()=>typeof flyerItems!=='undefined'?flyerItems.map(item=>({titre:item.titre,categorie:item.categorie,description:item.texte||'',telephone:item.telephone||'',imageUrl:item.image?`assets/flyers/${item.image}`:'',imageVersoUrl:item.imageVerso?`assets/flyers/${item.imageVerso}`:''})):[];
  let items=[];
- try{
-   const response=await fetch(url);
-   if(!response.ok)throw new Error(`Sanity ${response.status}`);
-   const data=await response.json();
-   items=(data.result||[]).filter(item=>item.imageUrl);
- }catch(error){
-   console.warn('Sanity indisponible, affichage des offres locales.',error);
- }
+ try{const r=await fetch(url);if(!r.ok)throw new Error(`Sanity ${r.status}`);const d=await r.json();items=(d.result||[]).filter(x=>x.imageUrl)}catch(e){console.warn('Sanity indisponible, offres locales utilisées.',e)}
  if(!items.length)items=localItems();
+ grid.innerHTML=items.map((item,i)=>{const tel=String(item.telephone||'').replace(/\s/g,'');return `<article class="flyer-card"><button class="flyer-visual" data-flyer="${i}" type="button" aria-label="Voir ${esc(item.titre)} en grand">${item.imageUrl?`<img src="${esc(item.imageUrl)}" alt="${esc(item.titre)} — L’Ami du Pain" loading="lazy">`:''}</button><div class="flyer-info">${item.categorie?`<span class="flyer-tag">${esc(item.categorie)}</span>`:''}<h3>${esc(item.titre)}</h3>${item.description?`<p>${esc(item.description)}</p>`:''}${tel?`<a class="flyer-call-btn" href="tel:${esc(tel)}">☎ ${esc(item.telephone)}</a>`:''}</div></article>`}).join('');
 
- grid.innerHTML=items.map((item,i)=>{
-   const tel=String(item.telephone||'').replace(/\s/g,'');
-   return `<article class="flyer-card"><button class="flyer-visual" data-flyer="${i}" type="button" aria-label="Voir ${esc(item.titre)} en grand">${item.imageUrl?`<img src="${esc(item.imageUrl)}" alt="${esc(item.titre)} — L’Ami du Pain" loading="lazy">`:''}</button><div class="flyer-info">${item.categorie?`<span class="flyer-tag">${esc(item.categorie)}</span>`:''}<h3>${esc(item.titre)}</h3>${item.description?`<p>${esc(item.description)}</p>`:''}${tel?`<a class="flyer-call-btn" href="tel:${esc(tel)}">☎ ${esc(item.telephone)}</a>`:''}</div></article>`;
- }).join('');
+ const box=document.querySelector('#flyer-lightbox'); if(!box)return;
+ const book=box.querySelector('#flyer-book'), recto=box.querySelector('.flyer-recto'), verso=box.querySelector('.flyer-verso');
+ const coverFront=box.querySelector('.brochure-cover-front'), coverBack=box.querySelector('.brochure-cover-back');
+ const closeBtn=box.querySelector('.flyer-lightbox-close'), openBtn=box.querySelector('.flyer-open-btn'), flipBtn=box.querySelector('.flyer-flip-btn'), hint=box.querySelector('.flyer-hint');
+ if(!book||!recto||!verso||!coverFront||!coverBack)return;
+ let current=null,state='closed';
 
- const box=document.querySelector('#flyer-lightbox');
- if(!box)return;
- const book=box.querySelector('#flyer-book');
- const recto=box.querySelector('.flyer-recto');
- const verso=box.querySelector('.flyer-verso');
- const closeBtn=box.querySelector('.flyer-lightbox-close');
- const sideBtn=box.querySelector('.flyer-side-btn');
- const controls=box.querySelector('.flyer-controls');
- const hint=box.querySelector('.flyer-hint');
- if(!book||!recto||!verso)return;
- let current=null, back=false;
-
- const update=()=>{
+ function setBg(el,url,pos){el.style.backgroundImage=`url("${String(url).replace(/"/g,'\\"')}")`;el.style.backgroundPosition=pos}
+ function renderState(){
    const hasVerso=!!current?.imageVersoUrl;
-   book.classList.toggle('show-back',back&&hasVerso);
    book.classList.toggle('single-flyer',!hasVerso);
-   if(controls)controls.hidden=!hasVerso;
-   if(hint)hint.hidden=!hasVerso;
-   if(sideBtn)sideBtn.textContent=back?'Revenir au recto':'Ouvrir le flyer';
- };
- const setSide=value=>{if(!current?.imageVersoUrl)return;back=value;update()};
- const toggle=()=>setSide(!back);
- const open=item=>{
-   if(!item?.imageUrl)return;
-   current=item;back=false;
-   recto.src=item.imageUrl;recto.alt=`${item.titre} — Recto`;
-   if(item.imageVersoUrl){verso.src=item.imageVersoUrl;verso.alt=`${item.titre} — Verso`}
-   else{verso.removeAttribute('src');verso.alt=''}
-   update();
-   book.classList.remove('flyer-opening');void book.offsetWidth;book.classList.add('flyer-opening');
-   box.classList.add('open');box.setAttribute('aria-hidden','false');document.body.classList.add('flyer-lightbox-lock');
- };
- const close=()=>{
-   box.classList.remove('open');box.setAttribute('aria-hidden','true');document.body.classList.remove('flyer-lightbox-lock');
-   book.classList.remove('show-back','flyer-opening');recto.removeAttribute('src');verso.removeAttribute('src');current=null;back=false;
- };
- grid.querySelectorAll('.flyer-visual').forEach(btn=>btn.addEventListener('click',()=>open(items[Number(btn.dataset.flyer)])));
- book.addEventListener('click',toggle);
- book.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&current?.imageVersoUrl){e.preventDefault();toggle()}});
- sideBtn?.addEventListener('click',toggle);
- closeBtn?.addEventListener('click',close);
+   book.classList.remove('is-closed','is-open','show-outside');
+   if(!hasVerso){book.classList.add('single-flyer');openBtn.hidden=true;flipBtn.hidden=true;hint.hidden=true;return}
+   openBtn.hidden=false;hint.hidden=false;
+   if(state==='closed'){
+     book.classList.add('is-closed');openBtn.textContent='Ouvrir le flyer';flipBtn.hidden=true;
+     hint.textContent='Le flyer est plié : vous voyez la page 1 (couverture)';
+   }else if(state==='open'){
+     book.classList.add('is-open');openBtn.textContent='Refermer le flyer';flipBtn.hidden=false;flipBtn.textContent='Voir l’extérieur (pages 4–1)';
+     hint.textContent='Flyer ouvert : pages 2 et 3';
+   }else{
+     book.classList.add('show-outside');openBtn.textContent='Refermer le flyer';flipBtn.hidden=false;flipBtn.textContent='Revenir à l’intérieur (pages 2–3)';
+     hint.textContent='Extérieur du flyer : page 4 à gauche, page 1 à droite';
+   }
+ }
+ function openItem(item){
+   if(!item?.imageUrl)return; current=item;state=item.imageVersoUrl?'closed':'open';
+   recto.src=item.imageUrl;recto.alt=`${item.titre} — extérieur pages 4 et 1`;
+   if(item.imageVersoUrl){
+     verso.src=item.imageVersoUrl;verso.alt=`${item.titre} — intérieur pages 2 et 3`;
+     setBg(coverFront,item.imageUrl,'right center');
+     setBg(coverBack,item.imageVersoUrl,'left center');
+   }else{verso.removeAttribute('src');coverFront.style.backgroundImage='none';coverBack.style.backgroundImage='none'}
+   renderState();box.classList.add('open');box.setAttribute('aria-hidden','false');document.body.classList.add('flyer-lightbox-lock');
+ }
+ function close(){box.classList.remove('open');box.setAttribute('aria-hidden','true');document.body.classList.remove('flyer-lightbox-lock');current=null;state='closed'}
+ function toggleOpen(){if(!current?.imageVersoUrl)return;if(state==='closed')state='open';else if(state==='open'||state==='outside')state='closed';renderState()}
+ function toggleOutside(){if(!current?.imageVersoUrl||state==='closed')return;state=state==='outside'?'open':'outside';renderState()}
+ grid.querySelectorAll('.flyer-visual').forEach(b=>b.addEventListener('click',()=>openItem(items[Number(b.dataset.flyer)])));
+ openBtn?.addEventListener('click',toggleOpen);flipBtn?.addEventListener('click',toggleOutside);closeBtn?.addEventListener('click',close);
  box.addEventListener('click',e=>{if(e.target===box)close()});
- addEventListener('keydown',e=>{if(!box.classList.contains('open'))return;if(e.key==='Escape')close();if(e.key==='ArrowRight')setSide(true);if(e.key==='ArrowLeft')setSide(false)});
+ book.addEventListener('keydown',e=>{if(e.key==='Enter'&&current?.imageVersoUrl){e.preventDefault();toggleOpen()}});
+ addEventListener('keydown',e=>{if(!box.classList.contains('open'))return;if(e.key==='Escape')close();if(e.key==='ArrowRight'&&state==='open')toggleOutside();if(e.key==='ArrowLeft'&&state==='outside')toggleOutside()});
 })();
 
 // Photo de la section "Une boulangerie familiale" gérée depuis galeries.js
