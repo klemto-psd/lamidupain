@@ -376,3 +376,21 @@ body.flyer-lightbox-lock{overflow:hidden}
 /* V4 — ADMIN SANITY / VACANCES / DÉPLIANT */
 .vacation-banner{position:relative;z-index:1200;background:#e5e5e5;color:#272727;padding:12px 24px;text-align:center;font-family:"DM Sans",sans-serif;font-size:13px;border-bottom:1px solid #c9c9c9}.vacation-banner strong{font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-right:12px}.vacation-banner span{font-weight:500}.vacation-banner[hidden]{display:none!important}
 .flyer-lightbox{position:fixed;inset:0;z-index:9999;background:rgba(16,12,9,.94);display:none;align-items:center;justify-content:center;padding:30px}.flyer-lightbox.open{display:flex}.flyer-lightbox-close{position:fixed;right:22px;top:20px;width:48px;height:48px;border:0;background:#fff;font-size:32px;cursor:pointer;z-index:10002}.brochure-viewer{width:min(1100px,94vw);display:flex;flex-direction:column;align-items:center;perspective:1800px}.brochure{width:min(900px,84vw);aspect-ratio:2/1;position:relative;transform-style:preserve-3d;transition:transform .7s ease}.brochure-inside{position:absolute;inset:0;background-color:#fff;box-shadow:0 24px 60px rgba(0,0,0,.4)}.brochure-cover{position:absolute;top:0;right:0;width:50%;height:100%;transform-origin:left center;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.2,.75,.25,1);z-index:3}.brochure-cover-front,.brochure-cover-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background-color:#fff}.brochure-cover-back{transform:rotateY(180deg)}.brochure.is-open .brochure-cover{transform:rotateY(-180deg)}.brochure.show-outside{transform:rotateY(180deg)}.brochure.simple-flyer{aspect-ratio:4/5;width:min(580px,78vw)}.brochure.simple-flyer .brochure-cover{display:none}.brochure.simple-flyer .brochure-inside{background-size:contain!important;background-repeat:no-repeat;background-position:center!important}.brochure-controls{display:flex;gap:10px;margin-top:24px}.brochure-controls button{border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.1);color:#fff;padding:12px 19px;font:600 12px "DM Sans",sans-serif;cursor:pointer}.brochure-controls button:hover{background:#fff;color:#222}.brochure-outside[hidden]{display:none!important}body.flyer-lightbox-lock{overflow:hidden}@media(max-width:700px){.vacation-banner{padding:10px 14px;font-size:11px}.vacation-banner strong{display:block;margin:0 0 3px}.brochure{width:94vw}.brochure-controls{flex-wrap:wrap;justify-content:center}.brochure-controls button{padding:10px 13px;font-size:10px}}
+
+
+/* V4.1 — corrections offres, dépliant et fermeture */
+.vacation-banner{background:#e2b509!important;color:#202020!important;border-bottom:1px solid rgba(0,0,0,.14)!important}
+.flyer-visual{background:#f5f0e8!important}
+.flyer-visual img{object-fit:contain!important}
+.brochure{width:min(900px,84vw);aspect-ratio:2/1;position:relative;transform:none!important;transition:none!important;transform-style:flat!important}
+.brochure-panel{position:absolute;inset:0;background-color:#fff;background-repeat:no-repeat;box-shadow:0 24px 60px rgba(0,0,0,.4);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .28s ease,transform .55s cubic-bezier(.2,.75,.25,1)}
+.brochure-cover-page{left:25%;right:25%;transform-origin:left center;z-index:4}
+.brochure[data-state="closed"] .brochure-cover-page{opacity:1;visibility:visible;transform:rotateY(0)}
+.brochure[data-state="inside"] .brochure-inside-spread{opacity:1;visibility:visible;transform:rotateY(0)}
+.brochure[data-state="outside"] .brochure-outside-spread{opacity:1;visibility:visible;transform:rotateY(0)}
+.brochure.simple-flyer{aspect-ratio:4/5;width:min(580px,78vw)}
+.brochure.simple-flyer .brochure-panel{display:none}
+.brochure.simple-flyer .brochure-simple-page{display:block;opacity:1;visibility:visible;inset:0}
+.brochure:not(.simple-flyer)[data-state="closed"]{width:min(450px,42vw);aspect-ratio:1/1}
+.brochure:not(.simple-flyer)[data-state="closed"] .brochure-cover-page{left:0;right:0}
+@media(max-width:700px){.brochure:not(.simple-flyer)[data-state="closed"]{width:min(82vw,450px)}.brochure{width:94vw}}

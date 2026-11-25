@@ -81,17 +81,49 @@ initGalerie({type:'traiteur',category:'traiteur',dossier:'assets/traiteur',gridS
 (async()=>{
  const grid=document.querySelector('#flyers-grid');if(!grid)return;
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+ const localFlyers=typeof flyerItems!=='undefined'?flyerItems:[];
+ const localImageFor=x=>{const n=norm(x.titre);const f=localFlyers.find(y=>norm(y.titre)===n)||(n.includes('classique')?localFlyers.find(y=>norm(y.titre).includes('classique')):n.includes('xl')?localFlyers.find(y=>norm(y.titre).includes('xl')):null);return f?`assets/flyers/${f.image}`:''};
  let items=[];
  try{const today=new Date().toISOString().slice(0,10);items=await sanityQuery(`*[_type=="enCeMoment" && afficher==true && (!defined(dateDebut)||dateDebut<="${today}") && (!defined(dateFin)||dateFin>="${today}")] | order(ordre asc){titre,categorie,description,"imageUrl":image.asset->url,"imageVersoUrl":imageVerso.asset->url}`)}catch(e){console.warn('Sanity offres indisponible',e)}
- if(!items.length && typeof flyerItems!=='undefined') items=flyerItems.map(x=>({titre:x.titre,categorie:x.categorie,description:x.texte,imageUrl:`assets/flyers/${x.image}`,imageVersoUrl:null}));
- grid.innerHTML=items.map((x,i)=>`<article class="flyer-card"><button class="flyer-visual" data-flyer="${i}" type="button"><img src="${esc(x.imageUrl)}" alt="${esc(x.titre)}" loading="lazy"></button><div class="flyer-info"><span class="flyer-tag">${esc(x.categorie||'Actualité')}</span><h3>${esc(x.titre)}</h3>${x.description?`<p>${esc(x.description)}</p>`:''}</div></article>`).join('');
- const box=document.querySelector('#flyer-lightbox');if(!box)return;const brochure=box.querySelector('#brochure'),inside=box.querySelector('.brochure-inside'),front=box.querySelector('.brochure-cover-front'),back=box.querySelector('.brochure-cover-back'),openBtn=box.querySelector('.brochure-open'),outsideBtn=box.querySelector('.brochure-outside'),closeBtn=box.querySelector('.flyer-lightbox-close');let current=null,opened=false,outside=false;
- const bg=(el,url,pos,size='200% 100%')=>{el.style.backgroundImage=`url("${url}")`;el.style.backgroundSize=size;el.style.backgroundPosition=pos;el.style.backgroundRepeat='no-repeat'};
- function setState(){brochure.classList.toggle('is-open',opened);brochure.classList.toggle('show-outside',outside);openBtn.textContent=opened?'Refermer le flyer':'Ouvrir le flyer';outsideBtn.hidden=!opened;outsideBtn.textContent=outside?'Voir l’intérieur (pages 2–3)':'Voir l’extérieur (pages 4–1)'}
- function openViewer(x){current=x;opened=false;outside=false;box.classList.add('open');document.body.classList.add('flyer-lightbox-lock');box.setAttribute('aria-hidden','false');if(x.imageVersoUrl){brochure.classList.remove('simple-flyer');bg(front,x.imageUrl,'right center');bg(back,x.imageVersoUrl,'left center');bg(inside,x.imageVersoUrl,'center','100% 100%');openBtn.hidden=false}else{brochure.classList.add('simple-flyer');bg(inside,x.imageUrl,'center','contain');openBtn.hidden=true;outsideBtn.hidden=true}setState()}
+ if(!items.length) items=localFlyers.map(x=>({titre:x.titre,categorie:x.categorie,description:x.texte,imageUrl:`assets/flyers/${x.image}`,imageVersoUrl:null}));
+ items.forEach(x=>x.fallbackImage=localImageFor(x));
+ grid.innerHTML=items.map((x,i)=>`<article class="flyer-card"><button class="flyer-visual" data-flyer="${i}" type="button"><img src="${esc(x.imageUrl||x.fallbackImage)}" data-fallback="${esc(x.fallbackImage)}" alt="${esc(x.titre)}" loading="lazy"></button><div class="flyer-info"><span class="flyer-tag">${esc(x.categorie||'Actualité')}</span><h3>${esc(x.titre)}</h3>${x.description?`<p>${esc(x.description)}</p>`:''}</div></article>`).join('');
+ grid.querySelectorAll('.flyer-visual img').forEach(img=>img.addEventListener('error',()=>{const f=img.dataset.fallback;if(f&&img.src!==new URL(f,location.href).href)img.src=f},{once:true}));
+ const box=document.querySelector('#flyer-lightbox');if(!box)return;
+ const brochure=box.querySelector('#brochure'),cover=box.querySelector('.brochure-cover-page'),inside=box.querySelector('.brochure-inside-spread'),outsideSpread=box.querySelector('.brochure-outside-spread'),simple=box.querySelector('.brochure-simple-page'),openBtn=box.querySelector('.brochure-open'),outsideBtn=box.querySelector('.brochure-outside'),closeBtn=box.querySelector('.flyer-lightbox-close');
+ let current=null,state='closed';
+ const bg=(el,url,pos='center',size='cover')=>{el.style.backgroundImage=url?`url("${url}")`:'none';el.style.backgroundSize=size;el.style.backgroundPosition=pos;el.style.backgroundRepeat='no-repeat'};
+ function setState(){
+   brochure.dataset.state=state;
+   const isSimple=brochure.classList.contains('simple-flyer');
+   if(isSimple){openBtn.hidden=true;outsideBtn.hidden=true;return}
+   openBtn.hidden=false;
+   outsideBtn.hidden=state==='closed';
+   openBtn.textContent=state==='closed'?'Ouvrir le flyer':'Fermer le flyer';
+   outsideBtn.textContent=state==='outside'?'Voir l’intérieur (pages 2–3)':'Retourner — voir pages 4–1';
+ }
+ function openViewer(x){
+   current=x;state='closed';box.classList.add('open');document.body.classList.add('flyer-lightbox-lock');box.setAttribute('aria-hidden','false');
+   const recto=x.imageUrl||x.fallbackImage;
+   if(x.imageVersoUrl){
+     brochure.classList.remove('simple-flyer');
+     // Recto = pages 4 | 1 : la couverture fermée n'affiche QUE la moitié droite (page 1).
+     bg(cover,recto,'right center','200% 100%');
+     // Verso = pages 2 | 3 : affiché en entier une fois ouvert.
+     bg(inside,x.imageVersoUrl,'center','100% 100%');
+     // Flyer retourné = pages 4 | 1, affiché en entier.
+     bg(outsideSpread,recto,'center','100% 100%');
+   }else{
+     brochure.classList.add('simple-flyer');bg(simple,recto,'center','contain');
+   }
+   setState();
+ }
  function close(){box.classList.remove('open');document.body.classList.remove('flyer-lightbox-lock');box.setAttribute('aria-hidden','true')}
  grid.querySelectorAll('.flyer-visual').forEach(b=>b.onclick=()=>openViewer(items[Number(b.dataset.flyer)]));
- openBtn.onclick=()=>{opened=!opened;if(!opened)outside=false;setState()};outsideBtn.onclick=()=>{outside=!outside;setState()};closeBtn.onclick=close;box.addEventListener('click',e=>{if(e.target===box)close()});addEventListener('keydown',e=>{if(e.key==='Escape'&&box.classList.contains('open'))close()});
+ openBtn.onclick=()=>{state=state==='closed'?'inside':'closed';setState()};
+ outsideBtn.onclick=()=>{state=state==='outside'?'inside':'outside';setState()};
+ closeBtn.onclick=close;box.addEventListener('click',e=>{if(e.target===box)close()});addEventListener('keydown',e=>{if(e.key==='Escape'&&box.classList.contains('open'))close()});
 })();
 
 // Photo familiale locale conservée
