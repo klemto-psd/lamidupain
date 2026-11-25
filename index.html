@@ -29,6 +29,7 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":["Bakery","LocalBusiness"],"name":"L'Ami du Pain","description":"Boulangerie pâtisserie artisanale à Monthois, près de Vouziers, dans les Ardennes.","telephone":"+33 3 24 30 93 16","email":"lamidupain08@gmail.com","address":{"@type":"PostalAddress","streetAddress":"2 rue des Champs","postalCode":"08400","addressLocality":"Monthois","addressRegion":"Ardennes","addressCountry":"FR"},"areaServed":[{"@type":"City","name":"Monthois"},{"@type":"City","name":"Vouziers"},{"@type":"AdministrativeArea","name":"Ardennes"}],"sameAs":["https://www.facebook.com/lamidupain08","https://www.instagram.com/lamidupain08/"]}</script>
 </head>
 <body>
+<div class="vacation-banner" id="vacation-banner" hidden></div>
 <header class="nav">
   <a class="brand" href="#accueil"><img src="assets/logo-header-badge.jpg" alt="L'Ami du Pain"></a>
   <button class="menu" aria-label="Ouvrir le menu">☰</button>
@@ -175,26 +176,18 @@
 
 <div class="flyer-lightbox" id="flyer-lightbox" aria-hidden="true">
   <button class="flyer-lightbox-close" type="button" aria-label="Fermer">×</button>
-  <div class="flyer-viewer">
-    <div class="brochure-stage" id="brochure-stage">
-      <div class="brochure" id="flyer-book" tabindex="0" aria-label="Dépliant interactif">
-        <div class="brochure-inside">
-          <img class="flyer-verso" src="" alt="Pages intérieures 2 et 3 du flyer">
-        </div>
-        <div class="brochure-outside">
-          <img class="flyer-recto" src="" alt="Pages extérieures 4 et 1 du flyer">
-        </div>
-        <div class="brochure-cover" aria-hidden="true">
-          <div class="brochure-cover-face brochure-cover-front"></div>
-          <div class="brochure-cover-face brochure-cover-back"></div>
-        </div>
+  <div class="brochure-viewer">
+    <div class="brochure" id="brochure">
+      <div class="brochure-inside"></div>
+      <div class="brochure-cover">
+        <div class="brochure-cover-front"></div>
+        <div class="brochure-cover-back"></div>
       </div>
     </div>
-    <div class="flyer-controls">
-      <button class="flyer-open-btn" type="button">Ouvrir le flyer</button>
-      <button class="flyer-flip-btn" type="button" hidden>Voir l’extérieur (pages 4–1)</button>
+    <div class="brochure-controls">
+      <button class="brochure-open" type="button">Ouvrir le flyer</button>
+      <button class="brochure-outside" type="button">Voir l’extérieur (pages 4–1)</button>
     </div>
-    <p class="flyer-hint">Cliquez sur « Ouvrir le flyer » pour déplier la couverture</p>
   </div>
 </div>
 

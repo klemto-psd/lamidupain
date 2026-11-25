@@ -373,40 +373,6 @@ body.flyer-lightbox-lock{overflow:hidden}
 }
 
 
-/* ============================================================
-   V3.13 — Vrai dépliant 2 volets : 1 fermé / 2-3 ouvert / 4-1 extérieur
-   ============================================================ */
-.flyer-visual{border:0;padding:0;width:100%;display:block;cursor:zoom-in}
-.flyer-lightbox{background:rgba(16,12,9,.95);padding:35px}
-.flyer-viewer{width:min(1220px,95vw);height:min(880px,92vh);display:flex;flex-direction:column;align-items:center;justify-content:center;perspective:2200px;overflow:visible}
-.brochure-stage{width:min(940px,84vw);height:min(650px,68vh);display:flex;align-items:center;justify-content:center;perspective:2200px;overflow:visible}
-.brochure{position:relative;width:100%;height:100%;transform-style:preserve-3d;filter:drop-shadow(0 26px 40px rgba(0,0,0,.42));transition:transform .8s cubic-bezier(.2,.72,.2,1);outline:none}
-.brochure-inside,.brochure-outside{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transition:opacity .3s ease,transform .8s cubic-bezier(.2,.72,.2,1);backface-visibility:hidden}
-.brochure-inside img,.brochure-outside img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;background:#fff}
-.brochure-inside::after,.brochure-outside::after{content:"";position:absolute;top:2%;bottom:2%;left:50%;width:2px;transform:translateX(-50%);background:linear-gradient(90deg,rgba(0,0,0,.18),rgba(255,255,255,.32),rgba(0,0,0,.1));pointer-events:none}
-.brochure-outside{opacity:0;pointer-events:none;transform:rotateY(180deg)}
-.brochure-cover{position:absolute;top:0;right:0;width:50%;height:100%;transform-style:preserve-3d;transform-origin:left center;transition:transform 1s cubic-bezier(.18,.72,.18,1);z-index:4}
-.brochure-cover-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background-repeat:no-repeat;background-size:200% 100%;background-color:#fff}
-.brochure-cover-front{background-position:right center}
-.brochure-cover-back{transform:rotateY(180deg);background-position:left center}
-.brochure.is-closed{transform:translateX(-25%) scale(.9)}
-.brochure.is-closed .brochure-inside{opacity:0}
-.brochure.is-closed .brochure-cover{transform:rotateY(0)}
-.brochure.is-open{transform:translateX(0) scale(1)}
-.brochure.is-open .brochure-inside{opacity:1}
-.brochure.is-open .brochure-cover{transform:rotateY(-180deg)}
-.brochure.show-outside{transform:rotateY(180deg)}
-.brochure.show-outside .brochure-inside,.brochure.show-outside .brochure-cover{opacity:0;pointer-events:none}
-.brochure.show-outside .brochure-outside{opacity:1;pointer-events:auto;transform:rotateY(180deg)}
-.brochure.single-flyer{transform:none!important}
-.brochure.single-flyer .brochure-inside,.brochure.single-flyer .brochure-cover{display:none}
-.brochure.single-flyer .brochure-outside{opacity:1;transform:none;pointer-events:auto}
-.brochure.single-flyer .brochure-outside::after{display:none}
-.flyer-controls{margin-top:20px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
-.flyer-open-btn,.flyer-flip-btn{border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.1);color:#fff;padding:11px 20px;font:600 12px/1 "DM Sans",sans-serif;letter-spacing:.5px;cursor:pointer;transition:.2s ease}
-.flyer-open-btn:hover,.flyer-flip-btn:hover{background:#fff;color:#222;transform:translateY(-2px)}
-.flyer-open-btn[hidden],.flyer-flip-btn[hidden],.flyer-hint[hidden]{display:none!important}
-.flyer-hint{margin:12px 0 0;color:rgba(255,255,255,.7);font-size:11px;letter-spacing:.4px;text-align:center}
-.flyer-lightbox-close{transition:transform .2s ease,background .2s ease,color .2s ease}
-.flyer-lightbox-close:hover{transform:rotate(90deg);background:#c49267;color:#fff}
-@media(max-width:700px){.flyer-lightbox{padding:58px 8px 18px}.flyer-viewer{width:98vw;height:88vh}.brochure-stage{width:96vw;height:60vh}.brochure.is-closed{transform:translateX(-25%) scale(.92)}.flyer-open-btn,.flyer-flip-btn{padding:10px 13px;font-size:10px}.flyer-hint{font-size:10px}}
+/* V4 — ADMIN SANITY / VACANCES / DÉPLIANT */
+.vacation-banner{position:relative;z-index:1200;background:#e5e5e5;color:#272727;padding:12px 24px;text-align:center;font-family:"DM Sans",sans-serif;font-size:13px;border-bottom:1px solid #c9c9c9}.vacation-banner strong{font-weight:800;text-transform:uppercase;letter-spacing:.8px;margin-right:12px}.vacation-banner span{font-weight:500}.vacation-banner[hidden]{display:none!important}
+.flyer-lightbox{position:fixed;inset:0;z-index:9999;background:rgba(16,12,9,.94);display:none;align-items:center;justify-content:center;padding:30px}.flyer-lightbox.open{display:flex}.flyer-lightbox-close{position:fixed;right:22px;top:20px;width:48px;height:48px;border:0;background:#fff;font-size:32px;cursor:pointer;z-index:10002}.brochure-viewer{width:min(1100px,94vw);display:flex;flex-direction:column;align-items:center;perspective:1800px}.brochure{width:min(900px,84vw);aspect-ratio:2/1;position:relative;transform-style:preserve-3d;transition:transform .7s ease}.brochure-inside{position:absolute;inset:0;background-color:#fff;box-shadow:0 24px 60px rgba(0,0,0,.4)}.brochure-cover{position:absolute;top:0;right:0;width:50%;height:100%;transform-origin:left center;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.2,.75,.25,1);z-index:3}.brochure-cover-front,.brochure-cover-back{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background-color:#fff}.brochure-cover-back{transform:rotateY(180deg)}.brochure.is-open .brochure-cover{transform:rotateY(-180deg)}.brochure.show-outside{transform:rotateY(180deg)}.brochure.simple-flyer{aspect-ratio:4/5;width:min(580px,78vw)}.brochure.simple-flyer .brochure-cover{display:none}.brochure.simple-flyer .brochure-inside{background-size:contain!important;background-repeat:no-repeat;background-position:center!important}.brochure-controls{display:flex;gap:10px;margin-top:24px}.brochure-controls button{border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.1);color:#fff;padding:12px 19px;font:600 12px "DM Sans",sans-serif;cursor:pointer}.brochure-controls button:hover{background:#fff;color:#222}.brochure-outside[hidden]{display:none!important}body.flyer-lightbox-lock{overflow:hidden}@media(max-width:700px){.vacation-banner{padding:10px 14px;font-size:11px}.vacation-banner strong{display:block;margin:0 0 3px}.brochure{width:94vw}.brochure-controls{flex-wrap:wrap;justify-content:center}.brochure-controls button{padding:10px 13px;font-size:10px}}
