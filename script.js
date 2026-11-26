@@ -88,14 +88,31 @@ initGalerie({type:'traiteur',category:'traiteur',dossier:'assets/traiteur',gridS
  try{const today=new Date().toISOString().slice(0,10);items=await sanityQuery(`*[_type=="enCeMoment" && afficher==true && (!defined(dateDebut)||dateDebut<="${today}") && (!defined(dateFin)||dateFin>="${today}")] | order(ordre asc){titre,categorie,description,"imageUrl":image.asset->url,"imageVersoUrl":imageVerso.asset->url}`)}catch(e){console.warn('Sanity offres indisponible',e)}
  if(!items.length) items=localFlyers.map(x=>({titre:x.titre,categorie:x.categorie,description:x.texte,imageUrl:`assets/flyers/${x.image}`,imageVersoUrl:null}));
  items.forEach(x=>x.fallbackImage=localImageFor(x));
- grid.innerHTML=items.map((x,i)=>`<article class="flyer-card"><button class="flyer-visual" data-flyer="${i}" type="button"><img src="${esc(x.imageUrl||x.fallbackImage)}" data-fallback="${esc(x.fallbackImage)}" alt="${esc(x.titre)}" loading="lazy"></button><div class="flyer-info"><span class="flyer-tag">${esc(x.categorie||'Actualité')}</span><h3>${esc(x.titre)}</h3>${x.description?`<p>${esc(x.description)}</p>`:''}</div></article>`).join('');
- grid.querySelectorAll('.flyer-visual img').forEach(img=>img.addEventListener('error',()=>{const f=img.dataset.fallback;if(f&&img.src!==new URL(f,location.href).href)img.src=f},{once:true}));
+ // Pour les formules connues, on privilégie les JPG locaux du site : ils sont stables et évitent
+ // qu'une référence Sanity incomplète affiche l'icône d'image cassée dans la carte.
+ items.forEach(x=>{
+   const local=localImageFor(x);
+   if(local)x.cardImage=local;
+   else x.cardImage=x.imageUrl||'';
+ });
+ grid.innerHTML=items.map((x,i)=>`<article class="flyer-card"><button class="flyer-visual" data-flyer="${i}" type="button">${x.cardImage?`<img src="${esc(x.cardImage)}" data-sanity="${esc(x.imageUrl||'')}" alt="${esc(x.titre)}" loading="lazy">`:`<span class="flyer-image-missing">Image à ajouter</span>`}</button><div class="flyer-info"><span class="flyer-tag">${esc(x.categorie||'Actualité')}</span><h3>${esc(x.titre)}</h3>${x.description?`<p>${esc(x.description)}</p>`:''}</div></article>`).join('');
+ grid.querySelectorAll('.flyer-visual img').forEach(img=>img.addEventListener('error',()=>{
+   // Si le local échoue et qu'une vraie URL Sanity existe, on l'essaie une fois.
+   const sanity=img.dataset.sanity;
+   if(sanity && img.src!==sanity){img.removeAttribute('data-sanity');img.src=sanity;return}
+   img.style.display='none';
+   const m=document.createElement('span');m.className='flyer-image-missing';m.textContent='Image à ajouter';img.parentElement.appendChild(m);
+ },{once:false}));
  const box=document.querySelector('#flyer-lightbox');if(!box)return;
  const brochure=box.querySelector('#brochure'),cover=box.querySelector('.brochure-cover-page'),inside=box.querySelector('.brochure-inside-spread'),outsideSpread=box.querySelector('.brochure-outside-spread'),simple=box.querySelector('.brochure-simple-page'),openBtn=box.querySelector('.brochure-open'),outsideBtn=box.querySelector('.brochure-outside'),closeBtn=box.querySelector('.flyer-lightbox-close');
  let current=null,state='closed';
  const bg=(el,url,pos='center',size='cover')=>{el.style.backgroundImage=url?`url("${url}")`:'none';el.style.backgroundSize=size;el.style.backgroundPosition=pos;el.style.backgroundRepeat='no-repeat'};
  function setState(){
    brochure.dataset.state=state;
+   if(!brochure.classList.contains('simple-flyer')){
+     const ratio=state==='closed' ? brochure.dataset.pageRatio : (state==='inside' ? brochure.dataset.insideRatio : brochure.dataset.outsideRatio);
+     if(ratio) brochure.style.aspectRatio=ratio;
+   }
    const isSimple=brochure.classList.contains('simple-flyer');
    if(isSimple){openBtn.hidden=true;outsideBtn.hidden=true;return}
    openBtn.hidden=false;
@@ -105,7 +122,7 @@ initGalerie({type:'traiteur',category:'traiteur',dossier:'assets/traiteur',gridS
  }
  function openViewer(x){
    current=x;state='closed';box.classList.add('open');document.body.classList.add('flyer-lightbox-lock');box.setAttribute('aria-hidden','false');
-   const recto=x.imageUrl||x.fallbackImage;
+   const recto=x.fallbackImage||x.imageUrl;
    if(x.imageVersoUrl){
      brochure.classList.remove('simple-flyer');
      // Recto = pages 4 | 1 : la couverture fermée n'affiche QUE la moitié droite (page 1).
@@ -114,6 +131,23 @@ initGalerie({type:'traiteur',category:'traiteur',dossier:'assets/traiteur',gridS
      bg(inside,x.imageVersoUrl,'center','100% 100%');
      // Flyer retourné = pages 4 | 1, affiché en entier.
      bg(outsideSpread,recto,'center','100% 100%');
+     // Respecte automatiquement le ratio réel des fichiers : aucune page n'est étirée.
+     const rectoProbe=new Image();
+     rectoProbe.onload=()=>{
+       const spread=rectoProbe.naturalWidth/rectoProbe.naturalHeight;
+       brochure.dataset.outsideRatio=String(spread);
+       brochure.dataset.pageRatio=String(spread/2);
+       if(state==='closed') brochure.style.aspectRatio=String(spread/2);
+       else if(state==='outside') brochure.style.aspectRatio=String(spread);
+     };
+     rectoProbe.src=recto;
+     const versoProbe=new Image();
+     versoProbe.onload=()=>{
+       const spread=versoProbe.naturalWidth/versoProbe.naturalHeight;
+       brochure.dataset.insideRatio=String(spread);
+       if(state==='inside') brochure.style.aspectRatio=String(spread);
+     };
+     versoProbe.src=x.imageVersoUrl;
    }else{
      brochure.classList.add('simple-flyer');bg(simple,recto,'center','contain');
    }
