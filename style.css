@@ -452,3 +452,33 @@ body.flyer-lightbox-lock{overflow:hidden}
   .vacation-banner strong{font-size:15px!important}
   .vacation-banner span{font-size:13px!important}
 }
+
+/* V3.5.6 — cartes offres : image réellement visible */
+.flyer-card .flyer-visual{
+  display:block!important;
+  position:relative!important;
+  width:100%!important;
+  min-width:100%!important;
+  height:auto!important;
+  aspect-ratio:4/5!important;
+  padding:0!important;
+  border:0!important;
+  overflow:hidden!important;
+  background:#eee7dc!important;
+}
+.flyer-card .flyer-visual > img{
+  display:block!important;
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  min-width:100%!important;
+  max-width:none!important;
+  height:100%!important;
+  min-height:100%!important;
+  object-fit:cover!important;
+  object-position:center!important;
+}
+.flyer-image-missing{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  padding:20px;color:#766b60;font-size:12px;text-transform:uppercase;letter-spacing:1px;
+}
