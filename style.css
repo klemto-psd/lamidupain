@@ -482,3 +482,11 @@ body.flyer-lightbox-lock{overflow:hidden}
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   padding:20px;color:#766b60;font-size:12px;text-transform:uppercase;letter-spacing:1px;
 }
+
+
+/* V3.5.8 — pages légales & liens footer */
+.footer-legal{grid-column:1/-1;display:flex;justify-content:center;align-items:center;gap:18px;flex-wrap:wrap;margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,.16);font-size:12px;letter-spacing:.03em}
+.footer-legal a{color:inherit;text-decoration:none;opacity:.82}.footer-legal a:hover{text-decoration:underline;opacity:1}
+.legal-page{background:#f6f0e6;color:#24323a;margin:0}.legal-header{height:92px;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 max(24px,calc((100vw - 1180px)/2));border-bottom:1px solid #e8dfd2;position:sticky;top:0;z-index:5}
+.legal-brand{display:flex;align-items:center;gap:14px;color:#024a5d;text-decoration:none;font-family:Georgia,serif;font-size:20px}.legal-brand img{width:58px;height:58px;object-fit:cover}.legal-back{color:#024a5d;text-decoration:none;font-weight:700;font-size:13px}.legal-main{max-width:900px;margin:0 auto;padding:70px 28px 90px}.legal-kicker{color:#c99a00;font-size:12px;font-weight:800;letter-spacing:.18em;margin-bottom:14px}.legal-main h1{font-family:Georgia,serif;color:#024a5d;font-size:clamp(40px,6vw,68px);line-height:1;margin:0 0 12px}.legal-updated{color:#7d756c;margin-bottom:48px}.legal-main section{background:#fff;padding:28px 32px;margin:18px 0;border:1px solid #eadfce}.legal-main h2{font-family:Georgia,serif;color:#024a5d;font-size:25px;margin:0 0 14px}.legal-main p{font-size:15px;line-height:1.75;margin:10px 0}.legal-main a{color:#024a5d;font-weight:700}.legal-simple-footer{background:#024a5d;color:#fff;display:flex;justify-content:center;gap:20px;flex-wrap:wrap;padding:25px;font-size:12px}.legal-simple-footer a{color:#fff;text-decoration:none}.legal-simple-footer a:hover{text-decoration:underline}
+@media(max-width:700px){.legal-header{height:74px;padding:0 16px}.legal-brand img{width:46px;height:46px}.legal-brand span{display:none}.legal-main{padding:46px 16px 65px}.legal-main section{padding:22px 20px}.legal-main h2{font-size:22px}.footer-legal{gap:10px 16px}}
